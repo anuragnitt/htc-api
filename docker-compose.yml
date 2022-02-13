@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  urtc-api:
+    build:
+      context: ./Docker
+    volumes:
+      - ./mounts/binary:/home/urtc/app/binary
+      - ./mounts/config.json:/home/urtc/app/config.json
+      - ./mounts/error.log:/home/urtc/app/error.log
+    restart: always
+    entrypoint: /bin/bash
+    command: -c /home/urtc/app/app.py
+    ports:
+      - "3000:3000"

@@ -1,0 +1,4 @@
+flask==2.0.2
+flask-limiter==2.1.3
+python-dateutil==2.8.2
+pytz==2019.3

@@ -1,0 +1,14 @@
+{
+    "execMap": {
+        "q1": "binary/q1.out",
+        "q2": "binary/q2.out",
+        "q3": "binary/q3.out",
+        "q4": "binary/q4.out",
+        "q5": "binary/q5.out",
+        "q6": "binary/q6.out",
+        "q7": "binary/q7.out",
+        "q8": "binary/q8.out",
+        "q9": "binary/q9.out",
+        "q10": "binary/q10.out"
+    }
+}
