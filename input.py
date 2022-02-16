@@ -3,23 +3,21 @@ import requests
 import sys
 
 
-howtorun = f"Instructions to use:\n\
+def exec_remote(apiUrl, vidUrl)-> str:
+    if any((
+        len(sys.argv) < 2,
+        sys.argv[1] == "--help",
+        sys.argv[1] == "-h"
+    )):
+        return f"Instructions to use:\n\
 {sys.argv[0]} <question>\n\
 <first input line>\n\
 ...\n\
 <last input line>\n\n\
 Example:\n\
 {sys.argv[0]} q1\n\
-981\n"
-
-
-def exec_remote(apiUrl)-> str:
-    if any((
-        len(sys.argv) < 2,
-        sys.argv[1] == "--help",
-        sys.argv[1] == "-h"
-    )):
-        return howtorun
+981\n\n\
+Tutorial video: {vidUrl}\n"
 
     question = sys.argv[1]
     args = []
@@ -44,7 +42,9 @@ def exec_remote(apiUrl)-> str:
 
 def main():
     apiUrl = "https://urtc.example.com"
-    response = exec_remote(apiUrl)
+    vidUrl = open("video-tutorial.url").read().strip()
+
+    response = exec_remote(apiUrl, vidUrl)
     print(response)
 
 
