@@ -3,10 +3,23 @@ import requests
 import sys
 
 
+howtorun = f"Instructions to use:\n\
+{sys.argv[0]} <question>\n\
+<first input line>\n\
+...\n\
+<last input line>\n\n\
+Example:\n\
+{sys.argv[0]} q1\n\
+981\n"
+
+
 def exec_remote(apiUrl)-> str:
-    if len(sys.argv) < 2:
-        print("mention question number")
-        return
+    if any((
+        len(sys.argv) < 2,
+        sys.argv[1] == "--help",
+        sys.argv[1] == "-h"
+    )):
+        return howtorun
 
     question = sys.argv[1]
     args = []
@@ -14,12 +27,11 @@ def exec_remote(apiUrl)-> str:
     if len(sys.argv) > 2:
         args.append(' '.join(sys.argv[2:]))
 
-    while True:
-        line = input()
-        if not line:
-            break
-        else:
-            args.append(line)
+    try:
+        while True:
+            args.append(input())
+    except EOFError:
+        pass
 
     req_body = {
         "question": question,
