@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import requests
 import sys
 
@@ -8,7 +9,10 @@ def exec_remote(apiUrl)-> str:
         return
 
     question = sys.argv[1]
-    args = [' '.join(sys.argv[2:])]
+    args = []
+
+    if len(sys.argv) > 2:
+        args.append(' '.join(sys.argv[2:]))
 
     while True:
         line = input()
