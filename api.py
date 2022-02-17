@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from flask import Flask, request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -90,10 +91,10 @@ def main(bin_dir, config, log_file, timezone, port, max_rate):
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=True)
 
     limiter = Limiter(
-        app,
         key_func=get_remote_address,
         default_limits=[f"{max_rate}/minute"]
     )
+    limiter.init_app(app)
 
     app.config.update(
         bin_dir=bin_dir,
