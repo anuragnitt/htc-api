@@ -1,15 +1,22 @@
 version: '3.9'
 
 services:
-  urtc-api:
+  htc-api:
     build:
-      context: ./Docker
+      context: ./
+      args:
+        - HTC_USER=${HTC_USER}
+      dockerfile: dockerfile_htc_api
+    env_file:
+      - .env
     volumes:
-      - ./mounts/binary:/home/urtc/app/binary
-      - ./mounts/config.json:/home/urtc/app/config.json
-      - ./mounts/error.log:/home/urtc/app/error.log
-    restart: always
+      - ./api.py:/home/${HTC_USER}/api.py
+      - ./assets/:/home/${HTC_USER}/assets/
+      - ./startup.sh:/home/${HTC_USER}/startup.sh
+    working_dir: /home/${HTC_USER}/
+    user: ${HTC_USER}
     entrypoint: /bin/bash
-    command: -c /home/urtc/app/app.py
+    command: -c /home/${HTC_USER}/startup.sh
+    restart: always
     ports:
-      - "3000:3000"
+      - "3000:${HTC_API_PORT}"

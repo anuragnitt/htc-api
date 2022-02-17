@@ -1,2 +1,6 @@
 **/__pycache__
-apache.conf
+htc-apache.conf
+input.py
+README.md
+video-tutorial.url
+*.example

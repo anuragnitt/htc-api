@@ -3,7 +3,31 @@ import requests
 import sys
 
 
-def exec_remote(apiUrl, vidUrl)-> str:
+"""
+interactive consoles wait for an empty line to stop reading
+non-interactive consoles (Google Colab) wait for EOFError to occur
+"""
+def console_input(is_interactive)-> [str]:
+    lines = []
+    lines_read = 0
+
+    try:
+        while True:
+            line = input()
+            if is_interactive:
+                if (len(line) == 0) and (lines_read == 0):
+                    continue
+                elif len(line) == 0:
+                    break
+                lines_read += 1
+            lines.append(line)
+    except EOFError:
+        pass
+    
+    return lines
+
+
+def exec_remote(apiUrl, vidUrl, is_interactive=True)-> str:
     if any((
         len(sys.argv) < 2,
         sys.argv[1] == "--help",
@@ -25,11 +49,7 @@ Tutorial video: {vidUrl}\n"
     if len(sys.argv) > 2:
         args.append(' '.join(sys.argv[2:]))
 
-    try:
-        while True:
-            args.append(input())
-    except EOFError:
-        pass
+    args += console_input(is_interactive)
 
     req_body = {
         "question": question,
@@ -41,10 +61,10 @@ Tutorial video: {vidUrl}\n"
 
 
 def main():
-    apiUrl = "https://urtc.example.com"
-    vidUrl = open("video-tutorial.url").read().strip()
+    apiUrl = "https://htc.example.com"
+    vidUrl = open("tutorial.url").read().strip()
 
-    response = exec_remote(apiUrl, vidUrl)
+    response = exec_remote(apiUrl, vidUrl, True) # to be used in Google Colab
     print(response)
 
 

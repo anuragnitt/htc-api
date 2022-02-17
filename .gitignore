@@ -2,3 +2,6 @@
 *.cpp
 *.out
 *.exe
+*.env
+*.log
+config.json
