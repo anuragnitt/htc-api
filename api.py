@@ -5,6 +5,7 @@ from os.path import dirname, realpath, join
 from subprocess import Popen, PIPE
 from datetime import datetime
 from pytz import timezone as make_tz
+from werkzeug.middleware.proxy_fix import ProxyFix
 import click, json, os, sys, traceback
 
 
@@ -36,17 +37,15 @@ def exec_bin(bin_file: str, args: list)-> str:
     return output.decode("utf-8")
 
 
-app = Flask("Hunt The Code")
-limiter = Limiter(app, key_func=get_remote_address)
+app = Flask("HTC-API")
 
 
 @app.errorhandler(429)
 def ratelimit_handler(e):
-  return "You have exceeded your rate-limit"
+  return "You have reached the maximum allowed request rate"
 
 
 @app.route("/", methods=["GET"])
-@limiter.limit("300/minute")
 def api_handler()-> [str, int]:
 
     try:
@@ -84,8 +83,18 @@ def api_handler()-> [str, int]:
 @click.option("--config", help="absolute path to the configuration file")
 @click.option("--log-file", help="absolute path to the error log file")
 @click.option("--timezone", default="Asia/Kolkata", help="timezone to use in log timestamps")
-@click.option("--port", default="8000", help="port number to run the application on")
-def main(bin_dir, config, log_file, timezone, port):
+@click.option("--port", default=8000, help="port number to run the application on")
+@click.option("--max-rate", default=15, help="maximum requests allowed per minute per user")
+def main(bin_dir, config, log_file, timezone, port, max_rate):
+
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=True)
+
+    limiter = Limiter(
+        app,
+        key_func=get_remote_address,
+        default_limits=[f"{max_rate}/minute"]
+    )
+
     app.config.update(
         bin_dir=bin_dir,
         config_file=config,
