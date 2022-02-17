@@ -43,7 +43,7 @@ app = Flask("HTC-API")
 
 @app.errorhandler(429)
 def ratelimit_handler(e):
-  return "You have reached the maximum allowed request rate"
+  return "You have reached the maximum allowed request rate", 429
 
 
 @app.route("/", methods=["GET"])

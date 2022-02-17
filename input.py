@@ -23,7 +23,7 @@ def console_input(is_interactive)-> [str]:
             lines.append(line)
     except EOFError:
         pass
-    
+
     return lines
 
 
@@ -64,7 +64,7 @@ def main():
     apiUrl = "https://htc.example.com"
     vidUrl = open("tutorial.url").read().strip()
 
-    response = exec_remote(apiUrl, vidUrl, True) # to be used in Google Colab
+    response = exec_remote(apiUrl, vidUrl, False) # to be used in Google Colab
     print(response)
 
 
