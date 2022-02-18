@@ -43,7 +43,8 @@ app = Flask("HTC-API")
 
 @app.errorhandler(429)
 def ratelimit_handler(e):
-  return "You have reached the maximum allowed request rate", 429
+    max_rate = app.config["max_rate"]
+    return f"Only {max_rate} requests are allowed per minute", 429
 
 
 @app.route("/", methods=["GET"])
@@ -85,7 +86,7 @@ def api_handler()-> [str, int]:
 @click.option("--log-file", help="absolute path to the error log file")
 @click.option("--timezone", default="Asia/Kolkata", help="timezone to use in log timestamps")
 @click.option("--port", default=8000, help="port number to run the application on")
-@click.option("--max-rate", default=15, help="maximum requests allowed per minute per user")
+@click.option("--max-rate", default=20, help="maximum requests allowed per minute per user")
 def main(bin_dir, config, log_file, timezone, port, max_rate):
 
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=True)
@@ -100,7 +101,8 @@ def main(bin_dir, config, log_file, timezone, port, max_rate):
         bin_dir=bin_dir,
         config_file=config,
         log_file=log_file,
-        timezone=timezone
+        timezone=timezone,
+        max_rate=max_rate
     )
 
     app.run(
