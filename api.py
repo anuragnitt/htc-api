@@ -10,7 +10,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 import click, json, os, sys, traceback
 
 
-def get_log_msg(input_params, tb_msg, tz):
+def get_log_msg(info, tb_msg, tz):
     tz = make_tz(tz)
     curr_time = datetime.now(tz)
     curr_time = curr_time.strftime(
@@ -19,7 +19,7 @@ def get_log_msg(input_params, tb_msg, tz):
 
     log_msg = f"{curr_time}\n\
 -------------------------------------------------------\n\
-REQUEST PARAMETERS:\n{input_params}\nEXCEPTION:\n{tb_msg}\
+{info}\nEXCEPTION:\n{tb_msg}\
 =======================================================\n\n"
 
     return log_msg
@@ -84,10 +84,11 @@ def api_handler()-> [str, int]:
         log_file = app.config["log_file"]
         tz = app.config["timezone"]
 
-        input_params = json.dumps(params, indent=4)
+        info = f"REQUEST PARAMETERS:\n\
+        {json.dumps(params, indent=4)}"
         tb_msg = traceback.format_exc()
-        log_msg = get_log_msg(input_params,tb_msg, tz)
 
+        log_msg = get_log_msg(info, tb_msg, tz)
         open(log_file, "a").write(log_msg)
 
         return "invalid parameters", 400
@@ -112,38 +113,51 @@ def api_handler()-> [str, int]:
     help="timezone to use in log timestamps"
 )
 @click.option(
+    "--host",
+    default="0.0.0.0",
+    help="hostname/IP on which the application is served"
+)
+@click.option(
     "--port",
     default=8000,
-    help="port number to run the application on"
+    help="port number on which the application is served"
 )
 @click.option(
     "--max-rate",
     default=20,
     help="maximum requests allowed per minute per user"
 )
-def main(bin_dir, config, log_file, timezone, port, max_rate):
+def main(bin_dir, config, log_file, timezone, host, port, max_rate):
 
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=True)
+    try:
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=True)
 
-    limiter = Limiter(
-        key_func=get_remote_address,
-        default_limits=[f"{max_rate}/minute"]
-    )
-    limiter.init_app(app)
+        limiter = Limiter(
+            key_func=get_remote_address,
+            default_limits=[f"{max_rate}/minute"]
+        )
+        limiter.init_app(app)
 
-    app.config.update(
-        bin_dir=bin_dir,
-        config_file=config,
-        log_file=log_file,
-        timezone=timezone,
-        max_rate=max_rate
-    )
+        app.config.update(
+            bin_dir=bin_dir,
+            config_file=config,
+            log_file=log_file,
+            timezone=timezone,
+            max_rate=max_rate
+        )
 
-    app.run(
-        host="0.0.0.0",
-        port=port,
-        use_reloader=True
-    )
+        app.run(
+            host=host,
+            port=port,
+            use_reloader=True
+        )
+    
+    except Exception:
+        info = "This exception occured of the route handler"
+        tb_msg = traceback.format_exc()
+
+        log_msg = get_log_msg(info, tb_msg, timezone)
+        open(log_file, "a").write(log_msg)
 
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@ OUT_EXT=".out"
 
 
 for file in `ls -a $BIN_DIR | grep $OUT_EXT`; do
-    rm $file 2>/dev/null
+    rm "$BIN_DIR/$file" 2>/dev/null
 done
 
 
