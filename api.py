@@ -13,12 +13,15 @@ import click, json, os, sys, traceback
 def get_log_msg(input_params, tb_msg, tz):
     tz = make_tz(tz)
     curr_time = datetime.now(tz)
-    curr_time = curr_time.strftime(f"[+] %Y-%m-%d %H:%M:%S [TZ: {tz}]")
+    curr_time = curr_time.strftime(
+        f"[+] %Y-%m-%d %H:%M:%S [TZ: {tz}]"
+    )
 
-    log_msg = f"{curr_time}\n--------------------------------------------\n"
-    log_msg += f"REQUEST PARAMETERS:\n{input_params}\nEXCEPTION:\n{tb_msg}"
-    log_msg += "=======================================================\n\n"
-    
+    log_msg = f"{curr_time}\n\
+-------------------------------------------------------\n\
+REQUEST PARAMETERS:\n{input_params}\nEXCEPTION:\n{tb_msg}\
+=======================================================\n\n"
+
     return log_msg
 
 
@@ -32,7 +35,11 @@ def exec_bin(bin_file: str, args: list)-> str:
     set_executable_mode(bin_file)
     argstring = "\n".join(args).encode("utf-8")
 
-    proc = Popen(bin_file, stdin=PIPE, stdout=PIPE)
+    proc = Popen(
+        bin_file,
+        stdin=PIPE,
+        stdout=PIPE
+    )
     output, _ = proc.communicate(argstring)
 
     return output.decode("utf-8")
@@ -58,9 +65,15 @@ def api_handler()-> [str, int]:
             execmap = config["execmap"]
 
             params = request.get_json()
-            bin_file = join(app.config["bin_dir"], execmap[params["question"]])
+            bin_file = join(
+                app.config["bin_dir"],
+                execmap[params["question"]]
+            )
 
-            output = exec_bin(bin_file, params["args"])
+            output = exec_bin(
+                bin_file,
+                params["args"]
+            )
 
             return output, 200
 
@@ -73,7 +86,7 @@ def api_handler()-> [str, int]:
 
         input_params = json.dumps(params, indent=4)
         tb_msg = traceback.format_exc()
-        log_msg = get_log_msg(input_params, tb_msg, tz)
+        log_msg = get_log_msg(input_params,tb_msg, tz)
 
         open(log_file, "a").write(log_msg)
 
@@ -81,12 +94,33 @@ def api_handler()-> [str, int]:
 
 
 @click.command()
-@click.option("--bin-dir", help="absolute path to the directory containing the executable files")
-@click.option("--config", help="absolute path to the configuration file")
-@click.option("--log-file", help="absolute path to the error log file")
-@click.option("--timezone", default="Asia/Kolkata", help="timezone to use in log timestamps")
-@click.option("--port", default=8000, help="port number to run the application on")
-@click.option("--max-rate", default=20, help="maximum requests allowed per minute per user")
+@click.option(
+    "--bin-dir",
+    help="absolute path to the directory containing the executable files"
+)
+@click.option(
+    "--config",
+    help="absolute path to the configuration file"
+)
+@click.option(
+    "--log-file",
+    help="absolute path to the error log file"
+)
+@click.option(
+    "--timezone",
+    default="Asia/Kolkata",
+    help="timezone to use in log timestamps"
+)
+@click.option(
+    "--port",
+    default=8000,
+    help="port number to run the application on"
+)
+@click.option(
+    "--max-rate",
+    default=20,
+    help="maximum requests allowed per minute per user"
+)
 def main(bin_dir, config, log_file, timezone, port, max_rate):
 
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=True)
