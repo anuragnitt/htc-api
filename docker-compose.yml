@@ -19,4 +19,4 @@ services:
     command: -c /home/${HTC_USER}/startup.sh
     restart: always
     ports:
-      - "3000:${HTC_API_PORT}"
+      - "3100:${HTC_API_PORT}"
