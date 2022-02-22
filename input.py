@@ -27,7 +27,7 @@ def console_input(is_interactive)-> [str]:
     return lines
 
 
-def exec_remote(apiUrl, vidUrl, is_interactive=True)-> str:
+def exec_remote(apiUrl, is_interactive=True)-> str:
     if any((
         len(sys.argv) < 2,
         sys.argv[1] == "--help",
@@ -40,8 +40,7 @@ def exec_remote(apiUrl, vidUrl, is_interactive=True)-> str:
 <last input line>\n\n\
 Example:\n\
 {sys.argv[0]} q1\n\
-981\n\n\
-Tutorial video: {vidUrl}\n"
+981\n"
 
     question = sys.argv[1]
     args = []
@@ -62,12 +61,9 @@ Tutorial video: {vidUrl}\n"
 
 def main():
     apiUrl = "https://htc.example.com"
-    vidUrl = open("tutorial.url").read().strip()
-
-    response = exec_remote(apiUrl, vidUrl, False) # to be used in Google Colab
+    response = exec_remote(apiUrl, False) # to be used in Google Colab
     print(response)
 
 
 if __name__ == "__main__":
     main()
-
